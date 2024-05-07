@@ -1,2 +1,8 @@
-# TMSHomework-Lesson40
-TeachMeSkills Homework - Lesson 40
+## TeachMeSkills Homework - Lesson 40
+
+### Домашнее задание:
+
+Реализовать вход в приложение с помощью email/password.  
+**Также реализовать вход с помощью Google.*  
+При войденном статусе давать возможность изменять юзернейм в конкретном аккаунте.  
+Сохранять его в Firestore.
