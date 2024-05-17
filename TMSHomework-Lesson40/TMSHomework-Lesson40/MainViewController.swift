@@ -153,7 +153,7 @@ class MainViewController: UIViewController {
     }
     
     private func setupAvatar() {
-        profilePicture.layer.cornerRadius = 20
+        profilePicture.layer.cornerRadius = Constants.profilePictureSide / 2
         profilePicture.layer.masksToBounds = true
         
         view.addSubview(profilePicture)
@@ -176,8 +176,10 @@ class MainViewController: UIViewController {
             if let error = error {
                 self.profilePicture = UIImageView(image: UIImage(named: "defaultAvatar"))
             } else if let data = data {
-                if let image = UIImage(data: data) {
-                    self.profilePicture = UIImageView(image: image)
+                if let avatarImage = UIImage(data: data) {
+                    DispatchQueue.main.async {
+                        self.profilePicture.image = avatarImage
+                    }
                 } else {
                     self.profilePicture = UIImageView(image: UIImage(named: "defaultAvatar"))
                 }

@@ -102,6 +102,7 @@ class AuthService {
     }
     
     func getUserPicture() -> URL {
+        print(Auth.auth().currentUser?.photoURL ?? URL(fileURLWithPath: ""))
         return Auth.auth().currentUser?.photoURL ?? URL(fileURLWithPath: "")
     }
     
