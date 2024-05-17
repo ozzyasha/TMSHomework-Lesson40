@@ -209,6 +209,9 @@ class SignUpViewController: UIViewController {
     @objc func signUp() {
         
         guard let username = usernameTextField.text, !username.isEmpty, let email = emailTextField.text, !email.isEmpty, let password = passwordTextField.text, !password.isEmpty else {
+            usernameTextField.checkIfEmpty()
+            emailTextField.checkIfEmpty()
+            passwordTextField.checkIfEmpty()
             errorLabel.text = "All fields should not be empty"
             return
         }
@@ -217,7 +220,10 @@ class SignUpViewController: UIViewController {
             self.errorLabel.text = errorText
         }
         
-        Analytics.logEvent("SignUpEvent", parameters: ["key" : "value"])
+        if Auth.auth().isSignIn(withEmailLink: email) {
+            let mainVC = MainViewController()
+            self.navigationController?.pushViewController(mainVC, animated: true)
+        }
     }
     
     @objc func signInLabelTapped() {

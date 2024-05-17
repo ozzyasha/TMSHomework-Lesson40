@@ -11,12 +11,13 @@ import FirebaseFirestore
 import FirebaseAnalytics
 import FirebaseCrashlytics
 import FirebaseAuth
+import GoogleSignIn
 
 class SignInViewController: UIViewController {
     
     private enum Constants {
         static let yellowCircleSide: CGFloat = UIScreen.main.bounds.width * 2
-        static let backgroundTopOffset: CGFloat = UIScreen.main.bounds.height / 6
+        static let backgroundTopOffset: CGFloat = UIScreen.main.bounds.height / 11
         static let backgroundLeadingOffset: CGFloat = 30
         static let backgroundCornerRadius: CGFloat = 20
         static let stackViewTopOffset: CGFloat = 20
@@ -24,7 +25,9 @@ class SignInViewController: UIViewController {
         static let signInButtonCornerRadius: CGFloat = 15
         static let textFieldsHeight: CGFloat = 40
         static let signInButtonHeight: CGFloat = 55
-        static let errorLabelHeight: CGFloat = 30
+        static let errorLabelHeight: CGFloat = 70
+        static let signUpLabelHeight: CGFloat = 15
+        static let alternativeSignInLabelHeight: CGFloat = 15
     }
     
     private let yellowCircle: UIView = {
@@ -91,7 +94,7 @@ class SignInViewController: UIViewController {
         label.textColor = .systemRed
         label.font = UIFont.systemFont(ofSize: 12)
         label.text = ""
-        label.numberOfLines = 2
+        label.numberOfLines = 5
         label.textAlignment = .natural
         return label
     }()
@@ -100,15 +103,38 @@ class SignInViewController: UIViewController {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.font = UIFont.systemFont(ofSize: 12)
-        let attributedText = NSMutableAttributedString(string: "Don't have an account yet? Sign up")
+        let attributedText = NSMutableAttributedString(string: "Don't have an account? Sign up")
         let signInRange = (attributedText.string as NSString).range(of: "Sign up")
         attributedText.addAttribute(.foregroundColor, value: UIColor.systemRed, range: signInRange)
         label.attributedText = attributedText
         label.isUserInteractionEnabled = true
         label.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(signUpLabelTapped)))
         label.numberOfLines = 2
-        label.textAlignment = .natural
+        label.textAlignment = .center
         return label
+    }()
+    
+    private lazy var alternativeSignInLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.font = UIFont.systemFont(ofSize: 12)
+        label.textColor = .systemGray
+        label.text = "or sign in with"
+        label.textAlignment = .center
+        return label
+    }()
+    
+    private lazy var googleSignInButton: UIButton = {
+        let button = UIButton()
+        button.setImage(UIImage(named: "googleIcon"), for: .normal)
+        button.contentMode = .scaleAspectFit
+        button.layer.backgroundColor = UIColor.white.cgColor
+        button.layer.cornerRadius = 24
+        button.layer.borderWidth = 1
+        button.layer.borderColor = UIColor.systemGray5.cgColor
+        button.addTarget(self, action: #selector(GoogleSignInButtonTapped), for: .touchUpInside)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
     }()
     
     private var stackView = UIStackView()
@@ -125,8 +151,13 @@ class SignInViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         authHandler = Auth.auth().addStateDidChangeListener { auth, user in
-            
+            if user != nil {
+                let mainVC = MainViewController()
+                self.navigationController?.pushViewController(mainVC, animated: true)
+            }
         }
+        
+//        googleAuthHandler = GIDToken.
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -164,10 +195,15 @@ class SignInViewController: UIViewController {
         stackView.addArrangedSubview(passwordTextField)
         stackView.addArrangedSubview(errorLabel)
         stackView.addArrangedSubview(signInButton)
+        stackView.addArrangedSubview(alternativeSignInLabel)
+        stackView.addArrangedSubview(googleSignInButton)
         stackView.addArrangedSubview(signUpLabel)
         
         view.addSubview(stackView)
         stackView.translatesAutoresizingMaskIntoConstraints = false
+        
+        let imageView = googleSignInButton.imageView!
+        imageView.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
             stackView.topAnchor.constraint(equalTo: whiteBackground.topAnchor, constant: Constants.stackViewTopOffset),
@@ -183,30 +219,63 @@ class SignInViewController: UIViewController {
             passwordTextField.widthAnchor.constraint(equalTo: whiteBackground.widthAnchor, constant: -40),
             passwordTextField.heightAnchor.constraint(equalToConstant: Constants.textFieldsHeight),
             
+            errorLabel.widthAnchor.constraint(equalTo: whiteBackground.widthAnchor, constant: -40),
+            errorLabel.heightAnchor.constraint(equalToConstant: Constants.errorLabelHeight),
+            
             signInButton.widthAnchor.constraint(equalTo: whiteBackground.widthAnchor, constant: -40),
             signInButton.heightAnchor.constraint(equalToConstant: Constants.signInButtonHeight),
             
-            errorLabel.widthAnchor.constraint(equalTo: whiteBackground.widthAnchor, constant: -40),
-            errorLabel.heightAnchor.constraint(equalToConstant: Constants.errorLabelHeight),
+            alternativeSignInLabel.widthAnchor.constraint(equalTo: whiteBackground.widthAnchor, constant: -40),
+            alternativeSignInLabel.heightAnchor.constraint(equalToConstant: Constants.alternativeSignInLabelHeight),
+            
+            googleSignInButton.widthAnchor.constraint(equalToConstant: 48),
+            googleSignInButton.heightAnchor.constraint(equalToConstant: 48),
+            
+            imageView.leadingAnchor.constraint(equalTo: googleSignInButton.leadingAnchor, constant: 10),
+            imageView.topAnchor.constraint(equalTo: googleSignInButton.topAnchor, constant: 10),
+            imageView.trailingAnchor.constraint(equalTo: googleSignInButton.trailingAnchor, constant: -10),
+            imageView.bottomAnchor.constraint(equalTo: googleSignInButton.bottomAnchor, constant: -10),
+            
+            
+            signUpLabel.widthAnchor.constraint(equalTo: whiteBackground.widthAnchor, constant: -40),
+            signUpLabel.heightAnchor.constraint(equalToConstant: Constants.signUpLabelHeight),
         ])
     }
     
     // MARK: - @objc methods
     @objc func signIn() {
         guard let email = emailTextField.text, !email.isEmpty, let password = passwordTextField.text, !password.isEmpty else {
+            emailTextField.checkIfEmpty()
+            passwordTextField.checkIfEmpty()
             errorLabel.text = "All fields should not be empty"
             return
         }
         AuthService.shared.signInWithEmail(email: email, password: password) { errorText in
-            self.errorLabel.text = errorText
+            if errorText == "No errors" {
+                return
+            } else {
+                self.errorLabel.text = errorText
+            }
         }
         
-        Analytics.logEvent("SignInEvent", parameters: ["key" : "value"])
+//        if Auth.auth().isSignIn(withEmailLink: email) {
+//            
+//        }
     }
     
     @objc func signUpLabelTapped() {
         let signUpViewController = SignUpViewController()
         self.navigationController?.pushViewController(signUpViewController, animated: true)
+    }
+    
+    @objc func GoogleSignInButtonTapped() {
+        AuthService.shared.signInWithGoogle(vc: self) { errorText in
+            if errorText == "No errors" {
+                return
+            } else {
+                self.errorLabel.text = errorText
+            }
+        }
     }
 
 }
