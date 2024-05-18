@@ -156,8 +156,6 @@ class SignInViewController: UIViewController {
                 self.navigationController?.pushViewController(mainVC, animated: true)
             }
         }
-        
-//        googleAuthHandler = GIDToken.
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -236,7 +234,6 @@ class SignInViewController: UIViewController {
             imageView.trailingAnchor.constraint(equalTo: googleSignInButton.trailingAnchor, constant: -10),
             imageView.bottomAnchor.constraint(equalTo: googleSignInButton.bottomAnchor, constant: -10),
             
-            
             signUpLabel.widthAnchor.constraint(equalTo: whiteBackground.widthAnchor, constant: -40),
             signUpLabel.heightAnchor.constraint(equalToConstant: Constants.signUpLabelHeight),
         ])
@@ -257,10 +254,7 @@ class SignInViewController: UIViewController {
                 self.errorLabel.text = errorText
             }
         }
-        
-//        if Auth.auth().isSignIn(withEmailLink: email) {
-//            
-//        }
+
     }
     
     @objc func signUpLabelTapped() {

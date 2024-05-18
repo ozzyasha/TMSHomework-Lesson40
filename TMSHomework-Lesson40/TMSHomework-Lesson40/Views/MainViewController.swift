@@ -6,10 +6,14 @@
 //
 
 import UIKit
-import FirebaseAnalytics
+import FirebaseAuth
+
+protocol UsernameDelegate: AnyObject {
+    func updateUsername(username: String)
+}
 
 class MainViewController: UIViewController {
-
+    
     enum Constants {
         static let yellowCircleSide: CGFloat = 300
         static let redCircleSide: CGFloat = 300
@@ -52,7 +56,7 @@ class MainViewController: UIViewController {
         return stackView
     }()
     
-    let teaDiaryButton: UIButton = {
+    private lazy var teaDiaryButton: UIButton = {
         let button = UIButton()
         button.layer.cornerRadius = Constants.buttonsCornerRadius
         button.layer.borderWidth = 1
@@ -68,7 +72,7 @@ class MainViewController: UIViewController {
         return button
     }()
     
-    let friendsButton: UIButton = {
+    private lazy var friendsButton: UIButton = {
         let button = UIButton()
         button.layer.cornerRadius = Constants.buttonsCornerRadius
         button.layer.borderWidth = 1
@@ -84,7 +88,7 @@ class MainViewController: UIViewController {
         return button
     }()
     
-    let editProfileButton: UIButton = {
+    private lazy var editProfileButton: UIButton = {
         let button = UIButton()
         button.layer.cornerRadius = Constants.buttonsCornerRadius
         button.layer.borderWidth = 1
@@ -97,6 +101,8 @@ class MainViewController: UIViewController {
         
         button.configuration = UIButton.Configuration.plain()
         button.configuration?.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 25, bottom: 0, trailing: 0)
+        
+        button.addTarget(self, action: #selector(editProfileTapped), for: .touchUpInside)
         return button
     }()
     
@@ -111,21 +117,32 @@ class MainViewController: UIViewController {
         return button
     }()
     
+    private lazy var signOutErrorLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.textColor = .systemRed
+        label.font = UIFont.systemFont(ofSize: 12)
+        label.text = ""
+        label.numberOfLines = 5
+        label.textAlignment = .natural
+        return label
+    }()
+    
     var profilePicture = UIImageView(image: UIImage(named: "defaultAvatar"))
     
     var username = AuthService.shared.getUsername()
     
+    // MARK: - MainViewController Lifecycle Methods
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationController?.isNavigationBarHidden = true
         view.backgroundColor = .white
         setupCircleViews()
-        setupAvatar()
-        setupLittleYellowCircle()
         setupGreetingLabel()
         setupStackView()
     }
     
+    // MARK: - Setup UI
     private func setupCircleViews() {
         makeCircle(yellowCircle, side: Constants.yellowCircleSide, color: .systemYellow)
         makeCircle(redCircle, side: Constants.redCircleSide, color: .systemRed)
@@ -144,6 +161,9 @@ class MainViewController: UIViewController {
             redCircle.widthAnchor.constraint(equalToConstant: Constants.redCircleSide),
             redCircle.heightAnchor.constraint(equalToConstant: Constants.redCircleSide)
         ])
+        
+        setupAvatar()
+        setupLittleYellowCircle()
         
     }
     
@@ -173,8 +193,10 @@ class MainViewController: UIViewController {
     
     private func loadAvatar(from url: URL) {
         URLSession.shared.dataTask(with: url) { data, response, error in
-            if let error = error {
-                self.profilePicture = UIImageView(image: UIImage(named: "defaultAvatar"))
+            if error != nil {
+                DispatchQueue.main.async {
+                    self.profilePicture = UIImageView(image: UIImage(named: "defaultAvatar"))
+                }
             } else if let data = data {
                 if let avatarImage = UIImage(data: data) {
                     DispatchQueue.main.async {
@@ -188,7 +210,7 @@ class MainViewController: UIViewController {
             }
         }.resume()
     }
-
+    
     
     private func setupLittleYellowCircle() {
         makeCircle(littleYellowCircle, side: Constants.littleYellowCircleSide, color: .systemYellow)
@@ -204,7 +226,22 @@ class MainViewController: UIViewController {
     }
     
     private func setupGreetingLabel() {
+        let userID = Auth.auth().currentUser?.uid ?? "nil"
+        
         greetingLabel.text = "Привет,\n" + username + "!"
+        if username == "" {
+            DatabaseService.shared.readFirestore(userID: userID) { data in
+                self.username = data
+                self.greetingLabel.text = "Привет,\n" + self.username  + "!"
+                
+                let greetingLabelText = self.greetingLabel.text ?? "nil"
+                let attributedGreetingLabel = NSMutableAttributedString(string: greetingLabelText)
+                let usernameRange = (greetingLabelText as NSString).range(of: self.username)
+                attributedGreetingLabel.addAttribute(.font, value: UIFont.boldSystemFont(ofSize: self.greetingLabel.font.pointSize), range: usernameRange)
+                self.greetingLabel.attributedText = attributedGreetingLabel
+            }
+        }
+        
         let greetingLabelText = greetingLabel.text ?? "nil"
         
         let attributedGreetingLabel = NSMutableAttributedString(string: greetingLabelText)
@@ -230,6 +267,7 @@ class MainViewController: UIViewController {
         buttonsStack.addArrangedSubview(friendsButton)
         buttonsStack.addArrangedSubview(editProfileButton)
         buttonsStack.addArrangedSubview(signOutButton)
+        buttonsStack.addArrangedSubview(signOutErrorLabel)
         
         view.addSubview(buttonsStack)
         
@@ -243,12 +281,46 @@ class MainViewController: UIViewController {
             buttonsStack.topAnchor.constraint(equalTo: greetingLabel.bottomAnchor, constant: 20),
         ])
     }
-
+    
+    // MARK: - @objc methods
+    @objc func editProfileTapped() {
+        let alert = UIAlertController(title: "Edit profile", message: "You can edit your username in the field below.\n When it will be ready, press OK to contunue.", preferredStyle: .alert)
+        alert.addTextField { textField in
+            textField.delegate = self
+            textField.placeholder = "Enter new username"
+        }
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel)
+        let okAction = UIAlertAction(title: "OK", style: .default, handler: { action in
+            let newUsername = alert.textFields?.first?.text ?? "nil"
+            DatabaseService.shared.writeFirestore(username: newUsername)
+            
+            let userID = Auth.auth().currentUser?.uid ?? "nil"
+            DatabaseService.shared.readFirestore(userID: userID) { data in
+                self.username = data
+                self.greetingLabel.text = "Привет,\n" + self.username  + "!"
+                
+                let greetingLabelText = self.greetingLabel.text ?? "nil"
+                let attributedGreetingLabel = NSMutableAttributedString(string: greetingLabelText)
+                let usernameRange = (greetingLabelText as NSString).range(of: self.username)
+                attributedGreetingLabel.addAttribute(.font, value: UIFont.boldSystemFont(ofSize: self.greetingLabel.font.pointSize), range: usernameRange)
+                self.greetingLabel.attributedText = attributedGreetingLabel
+            }
+        })
+        
+        alert.addAction(cancelAction)
+        alert.addAction(okAction)
+        
+        self.present(alert, animated: true)
+    }
+    
     @objc func signOut() {
-        AuthService.shared.signOut()
+        AuthService.shared.signOut() { error in
+            self.signOutErrorLabel.text = error
+        }
+        
         self.navigationController?.popToRootViewController(animated: true)
     }
-
+    
 }
 
 

@@ -39,6 +39,8 @@
 		7A6859B42BEA6CB0002161CC /* FirebaseRemoteConfigSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 7A6859B32BEA6CB0002161CC /* FirebaseRemoteConfigSwift */; };
 		7A6859B62BEA6CB0002161CC /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 7A6859B52BEA6CB0002161CC /* FirebaseStorage */; };
 		7A6859B82BEA6CB0002161CC /* FirebaseStorageCombine-Community in Frameworks */ = {isa = PBXBuildFile; productRef = 7A6859B72BEA6CB0002161CC /* FirebaseStorageCombine-Community */; };
+		7A92EAEF2BF7FB4F000EA06B /* DatabaseService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A92EAEE2BF7FB4F000EA06B /* DatabaseService.swift */; };
+		7A92EAF12BF95E31000EA06B /* MainViewController+extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A92EAF02BF95E31000EA06B /* MainViewController+extension.swift */; };
 		7A9639EE2BF0C52A00927F30 /* SignInViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A9639ED2BF0C52A00927F30 /* SignInViewController.swift */; };
 		7A9639F02BF1568800927F30 /* AuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A9639EF2BF1568800927F30 /* AuthService.swift */; };
 		7A9639F32BF26BDD00927F30 /* SignUpViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A9639F22BF26BDD00927F30 /* SignUpViewController.swift */; };
@@ -58,6 +60,8 @@
 		7A6859752BEA639E002161CC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		7A6859782BEA639E002161CC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		7A68597A2BEA639E002161CC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		7A92EAEE2BF7FB4F000EA06B /* DatabaseService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseService.swift; sourceTree = "<group>"; };
+		7A92EAF02BF95E31000EA06B /* MainViewController+extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MainViewController+extension.swift"; sourceTree = "<group>"; };
 		7A9639ED2BF0C52A00927F30 /* SignInViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInViewController.swift; sourceTree = "<group>"; };
 		7A9639EF2BF1568800927F30 /* AuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthService.swift; sourceTree = "<group>"; };
 		7A9639F22BF26BDD00927F30 /* SignUpViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpViewController.swift; sourceTree = "<group>"; };
@@ -128,19 +132,45 @@
 			children = (
 				7A68596C2BEA639C002161CC /* AppDelegate.swift */,
 				7A68596E2BEA639C002161CC /* SceneDelegate.swift */,
-				7A9639ED2BF0C52A00927F30 /* SignInViewController.swift */,
-				7A9639F22BF26BDD00927F30 /* SignUpViewController.swift */,
-				7A97BFF92BF3E2F900B361B2 /* SignInViewController+extension.swift */,
-				7A97C0172BF6422B00B361B2 /* UITextField+extension.swift */,
-				7A97BFFB2BF4EAE300B361B2 /* SignUpViewController+extension.swift */,
-				7A9639EF2BF1568800927F30 /* AuthService.swift */,
-				7A6859702BEA639C002161CC /* MainViewController.swift */,
+				7A92EAF22BF969DE000EA06B /* Views */,
+				7A92EAF42BF96A4C000EA06B /* Services */,
 				7A97C0192BF76CFD00B361B2 /* GoogleService-Info.plist */,
 				7A6859752BEA639E002161CC /* Assets.xcassets */,
 				7A6859772BEA639E002161CC /* LaunchScreen.storyboard */,
 				7A68597A2BEA639E002161CC /* Info.plist */,
 			);
 			path = "TMSHomework-Lesson40";
+			sourceTree = "<group>";
+		};
+		7A92EAF22BF969DE000EA06B /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				7A9639ED2BF0C52A00927F30 /* SignInViewController.swift */,
+				7A9639F22BF26BDD00927F30 /* SignUpViewController.swift */,
+				7A6859702BEA639C002161CC /* MainViewController.swift */,
+				7A92EAF32BF96A09000EA06B /* Extensions */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		7A92EAF32BF96A09000EA06B /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				7A97BFF92BF3E2F900B361B2 /* SignInViewController+extension.swift */,
+				7A97BFFB2BF4EAE300B361B2 /* SignUpViewController+extension.swift */,
+				7A92EAF02BF95E31000EA06B /* MainViewController+extension.swift */,
+				7A97C0172BF6422B00B361B2 /* UITextField+extension.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		7A92EAF42BF96A4C000EA06B /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				7A9639EF2BF1568800927F30 /* AuthService.swift */,
+				7A92EAEE2BF7FB4F000EA06B /* DatabaseService.swift */,
+			);
+			path = Services;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -282,7 +312,9 @@
 				7A6859712BEA639C002161CC /* MainViewController.swift in Sources */,
 				7A9639F02BF1568800927F30 /* AuthService.swift in Sources */,
 				7A97BFFC2BF4EAE300B361B2 /* SignUpViewController+extension.swift in Sources */,
+				7A92EAF12BF95E31000EA06B /* MainViewController+extension.swift in Sources */,
 				7A68596D2BEA639C002161CC /* AppDelegate.swift in Sources */,
+				7A92EAEF2BF7FB4F000EA06B /* DatabaseService.swift in Sources */,
 				7A97BFFA2BF3E2F900B361B2 /* SignInViewController+extension.swift in Sources */,
 				7A97C0182BF6422B00B361B2 /* UITextField+extension.swift in Sources */,
 				7A68596F2BEA639C002161CC /* SceneDelegate.swift in Sources */,

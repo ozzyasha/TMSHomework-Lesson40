@@ -135,7 +135,10 @@ class SignUpViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         authHandler = Auth.auth().addStateDidChangeListener { auth, user in
-            
+            if user != nil {
+                let mainVC = MainViewController()
+                self.navigationController?.pushViewController(mainVC, animated: true)
+            }
         }
     }
     

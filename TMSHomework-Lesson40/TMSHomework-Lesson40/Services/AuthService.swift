@@ -7,7 +7,6 @@
 
 import Foundation
 import FirebaseCore
-import FirebaseFirestore
 import FirebaseAnalytics
 import FirebaseCrashlytics
 import FirebaseAuth
@@ -21,11 +20,7 @@ class AuthService {
     func signUpWithEmail(email: String, username: String, password: String, completion: @escaping (String) -> Void) {
         Auth.auth().createUser(withEmail: email, password: password) { authResult, error in
             if let user = authResult?.user {
-                let email = user.email
-                let username = user.displayName
-                //username передать на MainVC
-                completion(email ?? "Error: can't receive an e-mail")
-                
+                DatabaseService.shared.writeFirestore(username: username)
             } else {
                 completion(error?.localizedDescription ?? "No errors")
             }
@@ -40,18 +35,11 @@ class AuthService {
     
     func signInWithEmail(email: String, password: String, completion: @escaping (String) -> Void) {
         Auth.auth().signIn(withEmail: email, password: password) { authResult, error in
-            if error == nil {
-                if let authResult = authResult {
-                    //                    let ref = Database.
-                }
+            guard error == nil else {
+                completion(error?.localizedDescription ?? "No errors")
+                return
             }
-            completion(error?.localizedDescription ?? "No errors")
-            //            guard authResult != nil else { return }
-            //            print("Sign In Success")
         }
-        //        if Auth.auth().currentUser != nil {
-        //            print("Sign In Success")
-        //        }
         
         Analytics.logEvent("SignInEvent", parameters: ["key" : "value"])
     }
@@ -70,8 +58,7 @@ class AuthService {
                 return
             }
             
-            guard let user = result?.user, let idToken = user.idToken?.tokenString
-            else {
+            guard let user = result?.user, let idToken = user.idToken?.tokenString else {
                 completion("Something is nil")
                 return
             }
@@ -80,37 +67,36 @@ class AuthService {
                                                            accessToken: user.accessToken.tokenString)
             
             Auth.auth().signIn(with: credential) { result, error in
-                if error == nil {
-                    if let result = result {
-                        //                    let ref = Database.
-                    }
+                guard error == nil else {
+                    completion(error?.localizedDescription ?? "No errors")
+                    return
                 }
-                
-                completion(error?.localizedDescription ?? "No errors")
             }
-            let email = user.profile?.email
-            completion(email ?? "Error: can't receive an e-mail")
         }
     }
     
-    func signUpWithGoogle() {
+    func getUsername() -> String {
+        
+        guard let displayName = Auth.auth().currentUser?.displayName else {
+            return ""
+        }
+        
+        return displayName
         
     }
     
-    func getUsername() -> String {
-        return Auth.auth().currentUser?.displayName ?? "No name"
-    }
-    
     func getUserPicture() -> URL {
-        print(Auth.auth().currentUser?.photoURL ?? URL(fileURLWithPath: ""))
         return Auth.auth().currentUser?.photoURL ?? URL(fileURLWithPath: "")
     }
     
-    func signOut() {
-        try? Auth.auth().signOut()
+    func signOut(completion: @escaping (String) -> ()) {
+        let firebaseAuth = Auth.auth()
+        do {
+            try firebaseAuth.signOut()
+        } catch let signOutError as NSError {
+            completion("Error signing out: \(signOutError.localizedDescription)")
+        }
     }
     
-    //    func checkIfSignedIn() {
-    //        if
-    //    }
+    
 }
