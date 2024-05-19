@@ -15,12 +15,11 @@ class DatabaseService {
     private init() { return }
     static let shared = DatabaseService()
     
-    weak var delegate: UsernameDelegate?
     private let db = Firestore.firestore()
+    private let user = Auth.auth().currentUser
     
     func writeFirestore(username: String) {
         let usersRef = db.collection("users")
-        let user = Auth.auth().currentUser
         
         usersRef.document("\(user?.uid ?? "undefided")").setData([
             "username": username,
@@ -28,7 +27,7 @@ class DatabaseService {
         ])
     }
     
-    func readFirestore(userID: String, completion: @escaping (String) -> ()) {
+    func readFirestore(completion: @escaping (String) -> ()) {
         
         Task { @MainActor in
             do {

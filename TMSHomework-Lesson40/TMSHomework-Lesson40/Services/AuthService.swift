@@ -19,7 +19,7 @@ class AuthService {
     
     func signUpWithEmail(email: String, username: String, password: String, completion: @escaping (String) -> Void) {
         Auth.auth().createUser(withEmail: email, password: password) { authResult, error in
-            if let user = authResult?.user {
+            if (authResult?.user) != nil {
                 DatabaseService.shared.writeFirestore(username: username)
             } else {
                 completion(error?.localizedDescription ?? "No errors")
@@ -75,13 +75,17 @@ class AuthService {
         }
     }
     
-    func getUsername() -> String {
+    func getUsername(completion: @escaping (String) -> ()) {
         
         guard let displayName = Auth.auth().currentUser?.displayName else {
-            return ""
+            DatabaseService.shared.readFirestore() { data in
+                completion(data)
+            }
+            completion("")
+            return
         }
         
-        return displayName
+        completion(displayName)
         
     }
     

@@ -6,7 +6,6 @@
 //
 
 import UIKit
-import FirebaseAuth
 
 protocol UsernameDelegate: AnyObject {
     func updateUsername(username: String)
@@ -130,7 +129,7 @@ class MainViewController: UIViewController {
     
     var profilePicture = UIImageView(image: UIImage(named: "defaultAvatar"))
     
-    var username = AuthService.shared.getUsername()
+    var username: String = ""
     
     // MARK: - MainViewController Lifecycle Methods
     override func viewDidLoad() {
@@ -226,28 +225,17 @@ class MainViewController: UIViewController {
     }
     
     private func setupGreetingLabel() {
-        let userID = Auth.auth().currentUser?.uid ?? "nil"
-        
-        greetingLabel.text = "Привет,\n" + username + "!"
-        if username == "" {
-            DatabaseService.shared.readFirestore(userID: userID) { data in
-                self.username = data
-                self.greetingLabel.text = "Привет,\n" + self.username  + "!"
-                
-                let greetingLabelText = self.greetingLabel.text ?? "nil"
-                let attributedGreetingLabel = NSMutableAttributedString(string: greetingLabelText)
-                let usernameRange = (greetingLabelText as NSString).range(of: self.username)
-                attributedGreetingLabel.addAttribute(.font, value: UIFont.boldSystemFont(ofSize: self.greetingLabel.font.pointSize), range: usernameRange)
-                self.greetingLabel.attributedText = attributedGreetingLabel
-            }
+        AuthService.shared.getUsername() { usernameFirestore in
+            self.username = usernameFirestore
+            self.greetingLabel.text = "Привет,\n" + self.username + "!"
+            
+            let greetingLabelText = self.greetingLabel.text ?? "nil"
+            
+            let attributedGreetingLabel = NSMutableAttributedString(string: greetingLabelText)
+            let usernameRange = (greetingLabelText as NSString).range(of: self.username)
+            attributedGreetingLabel.addAttribute(.font, value: UIFont.boldSystemFont(ofSize: self.greetingLabel.font.pointSize), range: usernameRange)
+            self.greetingLabel.attributedText = attributedGreetingLabel
         }
-        
-        let greetingLabelText = greetingLabel.text ?? "nil"
-        
-        let attributedGreetingLabel = NSMutableAttributedString(string: greetingLabelText)
-        let usernameRange = (greetingLabelText as NSString).range(of: username)
-        attributedGreetingLabel.addAttribute(.font, value: UIFont.boldSystemFont(ofSize: greetingLabel.font.pointSize), range: usernameRange)
-        greetingLabel.attributedText = attributedGreetingLabel
         
         view.addSubview(greetingLabel)
         
@@ -294,8 +282,7 @@ class MainViewController: UIViewController {
             let newUsername = alert.textFields?.first?.text ?? "nil"
             DatabaseService.shared.writeFirestore(username: newUsername)
             
-            let userID = Auth.auth().currentUser?.uid ?? "nil"
-            DatabaseService.shared.readFirestore(userID: userID) { data in
+            DatabaseService.shared.readFirestore() { data in
                 self.username = data
                 self.greetingLabel.text = "Привет,\n" + self.username  + "!"
                 
