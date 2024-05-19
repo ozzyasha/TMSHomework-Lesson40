@@ -61,6 +61,7 @@ class SignInViewController: UIViewController {
         textField.delegate = self
         textField.translatesAutoresizingMaskIntoConstraints = false
         textField.borderStyle = .roundedRect
+        textField.overrideUserInterfaceStyle = .light
         textField.placeholder = "e-mail"
         textField.autocapitalizationType = .none
         return textField
@@ -71,6 +72,7 @@ class SignInViewController: UIViewController {
         textField.delegate = self
         textField.translatesAutoresizingMaskIntoConstraints = false
         textField.borderStyle = .roundedRect
+        textField.overrideUserInterfaceStyle = .light
         textField.placeholder = "password"
         textField.autocapitalizationType = .none
         textField.isSecureTextEntry = true
@@ -103,6 +105,7 @@ class SignInViewController: UIViewController {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.font = UIFont.systemFont(ofSize: 12)
+        label.textColor = .black
         let attributedText = NSMutableAttributedString(string: "Don't have an account? Sign up")
         let signInRange = (attributedText.string as NSString).range(of: "Sign up")
         attributedText.addAttribute(.foregroundColor, value: UIColor.systemRed, range: signInRange)
@@ -130,8 +133,6 @@ class SignInViewController: UIViewController {
         button.contentMode = .scaleAspectFit
         button.layer.backgroundColor = UIColor.white.cgColor
         button.layer.cornerRadius = 24
-        button.layer.borderWidth = 1
-        button.layer.borderColor = UIColor.systemGray5.cgColor
         button.addTarget(self, action: #selector(GoogleSignInButtonTapped), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
         return button

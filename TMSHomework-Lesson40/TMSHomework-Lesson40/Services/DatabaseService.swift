@@ -37,7 +37,7 @@ class DatabaseService {
                     }
                 }
             } catch {
-                completion("\(error)")
+                completion("nil")
             }
         }
     }

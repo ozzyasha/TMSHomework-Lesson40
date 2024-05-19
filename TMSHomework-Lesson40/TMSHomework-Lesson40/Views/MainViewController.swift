@@ -33,6 +33,7 @@ class MainViewController: UIViewController {
     let greetingLabel: UILabel = {
         let label = UILabel()
         label.textAlignment = .left
+        label.textColor = .black
         label.font = .systemFont(ofSize: 30)
         label.numberOfLines = 2
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -230,6 +231,7 @@ class MainViewController: UIViewController {
             let attributedGreetingLabel = NSMutableAttributedString(string: greetingLabelText)
             let usernameRange = (greetingLabelText as NSString).range(of: self.username)
             attributedGreetingLabel.addAttribute(.font, value: UIFont.boldSystemFont(ofSize: self.greetingLabel.font.pointSize), range: usernameRange)
+            attributedGreetingLabel.addAttribute(.foregroundColor, value: UIColor.black, range: usernameRange)
             self.greetingLabel.attributedText = attributedGreetingLabel
         }
         
