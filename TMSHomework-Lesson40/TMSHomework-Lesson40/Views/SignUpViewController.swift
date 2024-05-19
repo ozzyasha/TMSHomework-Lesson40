@@ -58,6 +58,7 @@ class SignUpViewController: UIViewController {
         textField.delegate = self
         textField.translatesAutoresizingMaskIntoConstraints = false
         textField.borderStyle = .roundedRect
+        textField.overrideUserInterfaceStyle = .light
         textField.placeholder = "username"
         textField.autocapitalizationType = .none
         return textField
@@ -68,6 +69,7 @@ class SignUpViewController: UIViewController {
         textField.delegate = self
         textField.translatesAutoresizingMaskIntoConstraints = false
         textField.borderStyle = .roundedRect
+        textField.overrideUserInterfaceStyle = .light
         textField.placeholder = "e-mail"
         textField.autocapitalizationType = .none
         return textField
@@ -78,6 +80,7 @@ class SignUpViewController: UIViewController {
         textField.delegate = self
         textField.translatesAutoresizingMaskIntoConstraints = false
         textField.borderStyle = .roundedRect
+        textField.overrideUserInterfaceStyle = .light
         textField.placeholder = "password"
         textField.autocapitalizationType = .none
         textField.isSecureTextEntry = true
@@ -110,6 +113,7 @@ class SignUpViewController: UIViewController {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.font = UIFont.systemFont(ofSize: 12)
+        label.textColor = .black
         let attributedText = NSMutableAttributedString(string: "Already have an account? Sign in")
         let signInRange = (attributedText.string as NSString).range(of: "Sign in")
         attributedText.addAttribute(.foregroundColor, value: UIColor.systemRed, range: signInRange)
