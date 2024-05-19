@@ -7,10 +7,6 @@
 
 import UIKit
 
-protocol UsernameDelegate: AnyObject {
-    func updateUsername(username: String)
-}
-
 class MainViewController: UIViewController {
     
     enum Constants {

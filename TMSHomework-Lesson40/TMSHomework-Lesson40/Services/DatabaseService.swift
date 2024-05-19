@@ -16,14 +16,13 @@ class DatabaseService {
     static let shared = DatabaseService()
     
     private let db = Firestore.firestore()
-    private let user = Auth.auth().currentUser
     
     func writeFirestore(username: String) {
         let usersRef = db.collection("users")
         
-        usersRef.document("\(user?.uid ?? "undefided")").setData([
+        usersRef.document("\(Auth.auth().currentUser?.uid ?? "undefined")").setData([
             "username": username,
-            "e-mail": user?.email ?? "can't receive an email"
+            "e-mail": Auth.auth().currentUser?.email ?? "can't receive an email"
         ])
     }
     
@@ -33,9 +32,8 @@ class DatabaseService {
             do {
                 let snapshot = try await db.collection("users").getDocuments()
                 for document in snapshot.documents {
-                    let user = Auth.auth().currentUser
-                    if document.documentID == user?.uid {
-                        completion("\(document.data()["username"] ?? "usernameError")")
+                    if document.documentID == Auth.auth().currentUser?.uid {
+                        completion("\(document.data()["username"] ?? "nil")")
                     }
                 }
             } catch {

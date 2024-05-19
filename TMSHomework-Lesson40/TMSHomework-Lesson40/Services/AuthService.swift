@@ -81,11 +81,19 @@ class AuthService {
             DatabaseService.shared.readFirestore() { data in
                 completion(data)
             }
-            completion("")
             return
         }
         
-        completion(displayName)
+        DatabaseService.shared.readFirestore() { data in
+            if data != "nil" {
+                completion(data)
+            } else {
+                DatabaseService.shared.writeFirestore(username: displayName)
+                DatabaseService.shared.readFirestore() { data in
+                    completion(data)
+                }
+            }
+        }
         
     }
     
