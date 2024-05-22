@@ -222,9 +222,10 @@ class MainViewController: UIViewController {
     }
     
     private func setupGreetingLabel() {
-        AuthService.shared.getUsername() { usernameFirestore in
+        DatabaseService.shared.readFirestore { usernameFirestore in
             self.username = usernameFirestore
             self.greetingLabel.text = "Привет,\n" + self.username + "!"
+            DatabaseService.shared.writeFirestore(username: self.username)
             
             let greetingLabelText = self.greetingLabel.text ?? "nil"
             
@@ -270,7 +271,7 @@ class MainViewController: UIViewController {
     
     // MARK: - @objc methods
     @objc func editProfileTapped() {
-        let alert = UIAlertController(title: "Edit profile", message: "You can edit your username in the field below.\n When it will be ready, press OK to contunue.", preferredStyle: .alert)
+        let alert = UIAlertController(title: "Edit profile", message: "You can edit your username in the field below.\n When it will be ready, press OK to continue.", preferredStyle: .alert)
         alert.addTextField { textField in
             textField.delegate = self
             textField.placeholder = "Enter new username"

@@ -34,6 +34,10 @@ class DatabaseService {
                 for document in snapshot.documents {
                     if document.documentID == Auth.auth().currentUser?.uid {
                         completion("\(document.data()["username"] ?? "nil")")
+                        return
+                    } else {
+                        let displayName = Auth.auth().currentUser?.displayName
+                        completion(displayName ?? "nil")
                     }
                 }
             } catch {

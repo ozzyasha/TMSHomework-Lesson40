@@ -21,15 +21,14 @@ class AuthService {
         Auth.auth().createUser(withEmail: email, password: password) { authResult, error in
             if (authResult?.user) != nil {
                 DatabaseService.shared.writeFirestore(username: username)
+                self.signInWithEmail(email: email, password: password) { errorText in
+                    completion(errorText)
+                }
             } else {
                 completion(error?.localizedDescription ?? "No errors")
             }
         }
         Analytics.logEvent("SignUpEvent", parameters: ["key" : "value"])
-        
-        signInWithEmail(email: email, password: password) { errorText in
-            completion(errorText)
-        }
         
     }
     
@@ -73,24 +72,6 @@ class AuthService {
                 }
             }
         }
-    }
-    
-    func getUsername(completion: @escaping (String) -> ()) {
-        
-        guard let displayName = Auth.auth().currentUser?.displayName else {
-            DatabaseService.shared.readFirestore() { data in
-                completion(data)
-            }
-            return
-        }
-        completion(displayName)
-        
-        DatabaseService.shared.readFirestore() { data in
-            if data != "nil" {
-                completion(data)
-            }
-        }
-        
     }
     
     func getUserPicture() -> URL {
